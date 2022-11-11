@@ -22,8 +22,8 @@ import tensorflow as tf
 
 # from nets import inception_utils
 
-slim = tf.contrib.slim
-trunc_normal = lambda stddev: tf.truncated_normal_initializer(0.0, stddev)
+import tf_slim as slim
+trunc_normal = lambda stddev: tf.compat.v1.truncated_normal_initializer(0.0, stddev)
 
 """Contains common code shared by all inception models.
 Usage of arg scope:
@@ -36,7 +36,7 @@ def inception_arg_scope(weight_decay=0.00004,
                         batch_norm_decay=0.9997,
                         batch_norm_epsilon=0.001,
                         activation_fn=tf.nn.relu,
-                        batch_norm_updates_collections=tf.GraphKeys.UPDATE_OPS,
+                        batch_norm_updates_collections=tf.compat.v1.GraphKeys.UPDATE_OPS,
                         batch_norm_scale=False):
   """Defines the default arg scope for inception models.
   Args:
@@ -146,7 +146,7 @@ def inception_v3_base(inputs,
     raise ValueError('depth_multiplier is not greater than zero.')
   depth = lambda d: max(int(d * depth_multiplier), min_depth)
 
-  with tf.variable_scope(scope, 'InceptionV3', [inputs]):
+  with tf.compat.v1.variable_scope(scope, 'InceptionV3', [inputs]):
     with slim.arg_scope([slim.conv2d, slim.max_pool2d, slim.avg_pool2d],
                         stride=1, padding='VALID'):
       # 299 x 299 x 3
@@ -191,20 +191,20 @@ def inception_v3_base(inputs,
                         stride=1, padding='SAME'):
       # mixed: 35 x 35 x 256.
       end_point = 'Mixed_5b'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(64), [1, 1], scope='Conv2d_0a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(48), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = slim.conv2d(branch_1, depth(64), [5, 5],
                                  scope='Conv2d_0b_5x5')
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.conv2d(net, depth(64), [1, 1], scope='Conv2d_0a_1x1')
           branch_2 = slim.conv2d(branch_2, depth(96), [3, 3],
                                  scope='Conv2d_0b_3x3')
           branch_2 = slim.conv2d(branch_2, depth(96), [3, 3],
                                  scope='Conv2d_0c_3x3')
-        with tf.variable_scope('Branch_3'):
+        with tf.compat.v1.variable_scope('Branch_3'):
           branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
           branch_3 = slim.conv2d(branch_3, depth(32), [1, 1],
                                  scope='Conv2d_0b_1x1')
@@ -214,21 +214,21 @@ def inception_v3_base(inputs,
 
       # mixed_1: 35 x 35 x 288.
       end_point = 'Mixed_5c'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(64), [1, 1], scope='Conv2d_0a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(48), [1, 1], scope='Conv2d_0b_1x1')
           branch_1 = slim.conv2d(branch_1, depth(64), [5, 5],
                                  scope='Conv_1_0c_5x5')
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.conv2d(net, depth(64), [1, 1],
                                  scope='Conv2d_0a_1x1')
           branch_2 = slim.conv2d(branch_2, depth(96), [3, 3],
                                  scope='Conv2d_0b_3x3')
           branch_2 = slim.conv2d(branch_2, depth(96), [3, 3],
                                  scope='Conv2d_0c_3x3')
-        with tf.variable_scope('Branch_3'):
+        with tf.compat.v1.variable_scope('Branch_3'):
           branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
           branch_3 = slim.conv2d(branch_3, depth(64), [1, 1],
                                  scope='Conv2d_0b_1x1')
@@ -238,20 +238,20 @@ def inception_v3_base(inputs,
 
       # mixed_2: 35 x 35 x 288.
       end_point = 'Mixed_5d'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(64), [1, 1], scope='Conv2d_0a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(48), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = slim.conv2d(branch_1, depth(64), [5, 5],
                                  scope='Conv2d_0b_5x5')
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.conv2d(net, depth(64), [1, 1], scope='Conv2d_0a_1x1')
           branch_2 = slim.conv2d(branch_2, depth(96), [3, 3],
                                  scope='Conv2d_0b_3x3')
           branch_2 = slim.conv2d(branch_2, depth(96), [3, 3],
                                  scope='Conv2d_0c_3x3')
-        with tf.variable_scope('Branch_3'):
+        with tf.compat.v1.variable_scope('Branch_3'):
           branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
           branch_3 = slim.conv2d(branch_3, depth(64), [1, 1],
                                  scope='Conv2d_0b_1x1')
@@ -261,17 +261,17 @@ def inception_v3_base(inputs,
 
       # mixed_3: 17 x 17 x 768.
       end_point = 'Mixed_6a'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(384), [3, 3], stride=2,
                                  padding='VALID', scope='Conv2d_1a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(64), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = slim.conv2d(branch_1, depth(96), [3, 3],
                                  scope='Conv2d_0b_3x3')
           branch_1 = slim.conv2d(branch_1, depth(96), [3, 3], stride=2,
                                  padding='VALID', scope='Conv2d_1a_1x1')
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.max_pool2d(net, [3, 3], stride=2, padding='VALID',
                                      scope='MaxPool_1a_3x3')
         net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2])
@@ -280,16 +280,16 @@ def inception_v3_base(inputs,
 
       # mixed4: 17 x 17 x 768.
       end_point = 'Mixed_6b'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(192), [1, 1], scope='Conv2d_0a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(128), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = slim.conv2d(branch_1, depth(128), [1, 7],
                                  scope='Conv2d_0b_1x7')
           branch_1 = slim.conv2d(branch_1, depth(192), [7, 1],
                                  scope='Conv2d_0c_7x1')
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.conv2d(net, depth(128), [1, 1], scope='Conv2d_0a_1x1')
           branch_2 = slim.conv2d(branch_2, depth(128), [7, 1],
                                  scope='Conv2d_0b_7x1')
@@ -299,7 +299,7 @@ def inception_v3_base(inputs,
                                  scope='Conv2d_0d_7x1')
           branch_2 = slim.conv2d(branch_2, depth(192), [1, 7],
                                  scope='Conv2d_0e_1x7')
-        with tf.variable_scope('Branch_3'):
+        with tf.compat.v1.variable_scope('Branch_3'):
           branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
           branch_3 = slim.conv2d(branch_3, depth(192), [1, 1],
                                  scope='Conv2d_0b_1x1')
@@ -309,16 +309,16 @@ def inception_v3_base(inputs,
 
       # mixed_5: 17 x 17 x 768.
       end_point = 'Mixed_6c'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(192), [1, 1], scope='Conv2d_0a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(160), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = slim.conv2d(branch_1, depth(160), [1, 7],
                                  scope='Conv2d_0b_1x7')
           branch_1 = slim.conv2d(branch_1, depth(192), [7, 1],
                                  scope='Conv2d_0c_7x1')
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.conv2d(net, depth(160), [1, 1], scope='Conv2d_0a_1x1')
           branch_2 = slim.conv2d(branch_2, depth(160), [7, 1],
                                  scope='Conv2d_0b_7x1')
@@ -328,7 +328,7 @@ def inception_v3_base(inputs,
                                  scope='Conv2d_0d_7x1')
           branch_2 = slim.conv2d(branch_2, depth(192), [1, 7],
                                  scope='Conv2d_0e_1x7')
-        with tf.variable_scope('Branch_3'):
+        with tf.compat.v1.variable_scope('Branch_3'):
           branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
           branch_3 = slim.conv2d(branch_3, depth(192), [1, 1],
                                  scope='Conv2d_0b_1x1')
@@ -337,16 +337,16 @@ def inception_v3_base(inputs,
       if end_point == final_endpoint: return net, end_points
       # mixed_6: 17 x 17 x 768.
       end_point = 'Mixed_6d'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(192), [1, 1], scope='Conv2d_0a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(160), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = slim.conv2d(branch_1, depth(160), [1, 7],
                                  scope='Conv2d_0b_1x7')
           branch_1 = slim.conv2d(branch_1, depth(192), [7, 1],
                                  scope='Conv2d_0c_7x1')
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.conv2d(net, depth(160), [1, 1], scope='Conv2d_0a_1x1')
           branch_2 = slim.conv2d(branch_2, depth(160), [7, 1],
                                  scope='Conv2d_0b_7x1')
@@ -356,7 +356,7 @@ def inception_v3_base(inputs,
                                  scope='Conv2d_0d_7x1')
           branch_2 = slim.conv2d(branch_2, depth(192), [1, 7],
                                  scope='Conv2d_0e_1x7')
-        with tf.variable_scope('Branch_3'):
+        with tf.compat.v1.variable_scope('Branch_3'):
           branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
           branch_3 = slim.conv2d(branch_3, depth(192), [1, 1],
                                  scope='Conv2d_0b_1x1')
@@ -366,16 +366,16 @@ def inception_v3_base(inputs,
 
       # mixed_7: 17 x 17 x 768.
       end_point = 'Mixed_6e'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(192), [1, 1], scope='Conv2d_0a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(192), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = slim.conv2d(branch_1, depth(192), [1, 7],
                                  scope='Conv2d_0b_1x7')
           branch_1 = slim.conv2d(branch_1, depth(192), [7, 1],
                                  scope='Conv2d_0c_7x1')
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.conv2d(net, depth(192), [1, 1], scope='Conv2d_0a_1x1')
           branch_2 = slim.conv2d(branch_2, depth(192), [7, 1],
                                  scope='Conv2d_0b_7x1')
@@ -385,7 +385,7 @@ def inception_v3_base(inputs,
                                  scope='Conv2d_0d_7x1')
           branch_2 = slim.conv2d(branch_2, depth(192), [1, 7],
                                  scope='Conv2d_0e_1x7')
-        with tf.variable_scope('Branch_3'):
+        with tf.compat.v1.variable_scope('Branch_3'):
           branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
           branch_3 = slim.conv2d(branch_3, depth(192), [1, 1],
                                  scope='Conv2d_0b_1x1')
@@ -395,12 +395,12 @@ def inception_v3_base(inputs,
 
       # mixed_8: 8 x 8 x 1280.
       end_point = 'Mixed_7a'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(192), [1, 1], scope='Conv2d_0a_1x1')
           branch_0 = slim.conv2d(branch_0, depth(320), [3, 3], stride=2,
                                  padding='VALID', scope='Conv2d_1a_3x3')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(192), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = slim.conv2d(branch_1, depth(192), [1, 7],
                                  scope='Conv2d_0b_1x7')
@@ -408,7 +408,7 @@ def inception_v3_base(inputs,
                                  scope='Conv2d_0c_7x1')
           branch_1 = slim.conv2d(branch_1, depth(192), [3, 3], stride=2,
                                  padding='VALID', scope='Conv2d_1a_3x3')
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.max_pool2d(net, [3, 3], stride=2, padding='VALID',
                                      scope='MaxPool_1a_3x3')
         net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2])
@@ -416,22 +416,22 @@ def inception_v3_base(inputs,
       if end_point == final_endpoint: return net, end_points
       # mixed_9: 8 x 8 x 2048.
       end_point = 'Mixed_7b'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(320), [1, 1], scope='Conv2d_0a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(384), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = tf.concat(axis=3, values=[
               slim.conv2d(branch_1, depth(384), [1, 3], scope='Conv2d_0b_1x3'),
               slim.conv2d(branch_1, depth(384), [3, 1], scope='Conv2d_0b_3x1')])
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.conv2d(net, depth(448), [1, 1], scope='Conv2d_0a_1x1')
           branch_2 = slim.conv2d(
               branch_2, depth(384), [3, 3], scope='Conv2d_0b_3x3')
           branch_2 = tf.concat(axis=3, values=[
               slim.conv2d(branch_2, depth(384), [1, 3], scope='Conv2d_0c_1x3'),
               slim.conv2d(branch_2, depth(384), [3, 1], scope='Conv2d_0d_3x1')])
-        with tf.variable_scope('Branch_3'):
+        with tf.compat.v1.variable_scope('Branch_3'):
           branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
           branch_3 = slim.conv2d(
               branch_3, depth(192), [1, 1], scope='Conv2d_0b_1x1')
@@ -441,22 +441,22 @@ def inception_v3_base(inputs,
 
       # mixed_10: 8 x 8 x 2048.
       end_point = 'Mixed_7c'
-      with tf.variable_scope(end_point):
-        with tf.variable_scope('Branch_0'):
+      with tf.compat.v1.variable_scope(end_point):
+        with tf.compat.v1.variable_scope('Branch_0'):
           branch_0 = slim.conv2d(net, depth(320), [1, 1], scope='Conv2d_0a_1x1')
-        with tf.variable_scope('Branch_1'):
+        with tf.compat.v1.variable_scope('Branch_1'):
           branch_1 = slim.conv2d(net, depth(384), [1, 1], scope='Conv2d_0a_1x1')
           branch_1 = tf.concat(axis=3, values=[
               slim.conv2d(branch_1, depth(384), [1, 3], scope='Conv2d_0b_1x3'),
               slim.conv2d(branch_1, depth(384), [3, 1], scope='Conv2d_0c_3x1')])
-        with tf.variable_scope('Branch_2'):
+        with tf.compat.v1.variable_scope('Branch_2'):
           branch_2 = slim.conv2d(net, depth(448), [1, 1], scope='Conv2d_0a_1x1')
           branch_2 = slim.conv2d(
               branch_2, depth(384), [3, 3], scope='Conv2d_0b_3x3')
           branch_2 = tf.concat(axis=3, values=[
               slim.conv2d(branch_2, depth(384), [1, 3], scope='Conv2d_0c_1x3'),
               slim.conv2d(branch_2, depth(384), [3, 1], scope='Conv2d_0d_3x1')])
-        with tf.variable_scope('Branch_3'):
+        with tf.compat.v1.variable_scope('Branch_3'):
           branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
           branch_3 = slim.conv2d(
               branch_3, depth(192), [1, 1], scope='Conv2d_0b_1x1')
@@ -525,7 +525,7 @@ def inception_v3(inputs,
     raise ValueError('depth_multiplier is not greater than zero.')
   depth = lambda d: max(int(d * depth_multiplier), min_depth)
 
-  with tf.variable_scope(scope, 'InceptionV3', [inputs], reuse=reuse) as scope:
+  with tf.compat.v1.variable_scope(scope, 'InceptionV3', [inputs], reuse=reuse) as scope:
     with slim.arg_scope([slim.batch_norm, slim.dropout],
                         is_training=is_training):
       net, end_points = inception_v3_base(
@@ -537,7 +537,7 @@ def inception_v3(inputs,
         with slim.arg_scope([slim.conv2d, slim.max_pool2d, slim.avg_pool2d],
                             stride=1, padding='SAME'):
           aux_logits = end_points['Mixed_6e']
-          with tf.variable_scope('AuxLogits'):
+          with tf.compat.v1.variable_scope('AuxLogits'):
             aux_logits = slim.avg_pool2d(
                 aux_logits, [5, 5], stride=3, padding='VALID',
                 scope='AvgPool_1a_5x5')
@@ -560,7 +560,7 @@ def inception_v3(inputs,
             end_points['AuxLogits'] = aux_logits
 
       # Final pooling and prediction
-      with tf.variable_scope('Logits'):
+      with tf.compat.v1.variable_scope('Logits'):
         if global_pool:
           # Global average pooling.
           net = tf.reduce_mean(net, [1, 2], keep_dims=True, name='GlobalPool')

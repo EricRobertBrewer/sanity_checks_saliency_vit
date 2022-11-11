@@ -4,8 +4,7 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import saliency
-import keras
+import saliency.tf1 as saliency
 from keras.datasets import mnist, fashion_mnist
 import PIL.Image
 import json
@@ -14,7 +13,7 @@ import pickle
 from inception_v3 import inception_v3
 from inception_v3 import inception_v3_arg_scope
 
-slim = tf.contrib.slim
+import tf_slim as slim
 
 
 # some utils
@@ -48,7 +47,7 @@ def diverging_norm(img):
 
 
 def LoadImage(file_path, resize=True, sztple=(299, 299)):
-    with tf.gfile.GFile(file_path, 'rb') as file:
+    with tf.io.gfile.GFile(file_path, 'rb') as file:
         img = PIL.Image.open(file).convert('RGB')
     if resize:
         img = img.resize(sztple, PIL.Image.ANTIALIAS)
@@ -105,7 +104,7 @@ def save_pickle_file(dt, absfp, platform='linux_workstation'):
         raise ValueError("Platform option not availaible.")
 
     if platform == "cloudbucket":
-        with tf.gfile.Open(absfp, "wb") as fileobj:  # this is writing bytes
+        with tf.compat.v1.gfile.Open(absfp, "wb") as fileobj:  # this is writing bytes
             fileobj.write(pickle.dumps(dt))
         return True
     else:
@@ -123,7 +122,7 @@ def load_pickle_file(absfp, platform='linux_workstation'):
         raise ValueError("Platform option not availaible.")
 
     if platform == "cloudbucket":
-        with tf.gfile.Open(absfp, "rb") as infile:
+        with tf.compat.v1.gfile.Open(absfp, "rb") as infile:
             dt = pickle.load(infile)
         return dt
     else:
@@ -163,7 +162,7 @@ def get_saliency_constructors(model_graph,
                          "is be provided.")
     with model_graph.as_default():
         with tf.name_scope("saliency"):
-            neuron_selector = tf.placeholder(tf.int32)
+            neuron_selector = tf.compat.v1.placeholder(tf.int32)
             y_salient = logit_tensor[neuron_selector]
     gradient_saliency = saliency.GradientSaliency(model_graph,
                                                   model_session,
@@ -232,10 +231,10 @@ def get_nist_data(mst=True,
         x_valid, x_train = x_train[:5000], x_train[5000:]
         y_valid, y_train = y_train[:5000], y_train[5000:]
     if label_to_categorical:
-        y_test = keras.utils.to_categorical(y_test, num_classes)
-        y_train = keras.utils.to_categorical(y_train, num_classes)
+        y_test = tf.keras.utils.to_categorical(y_test, num_classes)
+        y_train = tf.keras.utils.to_categorical(y_train, num_classes)
     if validation:
-        y_valid = keras.utils.to_categorical(y_valid, num_classes)
+        y_valid = tf.keras.utils.to_categorical(y_valid, num_classes)
     return (x_train, x_valid, x_test), (y_train, y_valid, y_test)
 
 
@@ -246,7 +245,7 @@ class Inceptionv3_Wrapper(object):
         lblmetadatapath='../models/inceptionv3/imagenet_class_index.json'
     ):
 
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
         self.graph = tf.Graph()
         self.chkpntpath = chkpointpath
         self.labelmetadatapath = lblmetadatapath
@@ -255,20 +254,20 @@ class Inceptionv3_Wrapper(object):
         if not tf.io.gfile.exists(self.chkpntpath):
             raise ValueError("There is no checkpoint at the input path")
         with self.graph.as_default():
-            self.input_batch = tf.placeholder(tf.float32,
+            self.input_batch = tf.compat.v1.placeholder(tf.float32,
                                               shape=(None, 299, 299, 3))
             with slim.arg_scope(inception_v3_arg_scope()):
                 _, self.end_points = inception_v3(
                   self.input_batch,
                   is_training=False,
                   num_classes=self.num_classes)
-                self.session = tf.Session(graph=self.graph)
-                self.saver = tf.train.Saver()
+                self.session = tf.compat.v1.Session(graph=self.graph)
+                self.saver = tf.compat.v1.train.Saver()
                 self.saver.restore(self.session, self.chkpntpath)
 
             self.logits = self.graph.get_tensor_by_name(
                 'InceptionV3/Logits/SpatialSqueeze:0')
-            self.trainable_variables = tf.trainable_variables()
+            self.trainable_variables = tf.compat.v1.trainable_variables()
 
         if not tf.io.gfile.exists(self.labelmetadatapath):
             raise ValueError("There is no label file at the input path.")
@@ -309,7 +308,7 @@ class Inceptionv3_Wrapper(object):
 
         # now reinitialize
         with self.graph.as_default():
-            to_ini = tf.initialize_variables(tensors)
+            to_ini = tf.compat.v1.initialize_variables(tensors)
             _ = self.session.run(to_ini)
         return True
 
