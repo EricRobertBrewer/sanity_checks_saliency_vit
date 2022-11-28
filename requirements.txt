@@ -134,7 +134,7 @@ tensorflow-metadata==1.10.0
 termcolor==2.1.0
 terminado==0.17.0
 tf-slim==1.1.0
-tifffile==2022.10.10
+tifffile==2021.11.2
 tinycss2==1.2.1
 toml==0.10.2
 tomli==2.0.1
